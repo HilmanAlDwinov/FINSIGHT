@@ -61,6 +61,104 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // --- TRANSFER LOGIC ---
+    const transferModal = document.getElementById('transferModal');
+    const transferForm = document.getElementById('transferForm');
+    const transferFrom = document.getElementById('transferFrom');
+    const transferTo = document.getElementById('transferTo');
+
+    if (transferModal) {
+        transferModal.addEventListener('show.bs.modal', () => {
+            transferFrom.innerHTML = '<option value="">Select Source Wallet</option>';
+            transferTo.innerHTML = '<option value="">Select Destination Wallet</option>';
+            fetchWalletsForTransfer();
+        });
+    }
+
+    if (transferForm) {
+        // Handle Transfer Submit
+        transferForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = {
+                from_wallet_id: transferFrom.value,
+                to_wallet_id: transferTo.value,
+                amount: document.getElementById('transferAmount').value,
+                notes: document.getElementById('transferNotes').value
+            };
+
+            if (data.from_wallet_id === data.to_wallet_id) {
+                alert('Source and destination wallets must be different.');
+                return;
+            }
+
+            const btn = transferForm.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Processing...';
+
+            try {
+                const result = await APIClient.post('/transfers', data);
+                if (result.success) {
+                    // Close Modal
+                    const modal = bootstrap.Modal.getInstance(transferModal);
+                    modal.hide();
+                    transferForm.reset();
+                    // Refresh Wallet List
+                    loadWallets();
+                    alert('Transfer successful!');
+                } else {
+                    alert(result.message || 'Transfer failed.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+    }
+
+    async function fetchWalletsForTransfer() {
+        console.log('fetchWalletsForTransfer called');
+        try {
+            const result = await APIClient.get('/wallets');
+            console.log('API Response:', result);
+
+            if (result.success) {
+                const wallets = result.data;
+                console.log('Wallets data:', wallets);
+
+                if (!wallets || wallets.length === 0) {
+                    console.warn('No wallets found');
+                    transferFrom.innerHTML = '<option value="">No wallets available</option>';
+                    transferTo.innerHTML = '<option value="">No wallets available</option>';
+                    return;
+                }
+
+                wallets.forEach(wallet => {
+                    console.log('Adding wallet:', wallet.wallet_name);
+                    const optionFrom = document.createElement('option');
+                    optionFrom.value = wallet.wallet_id;
+                    optionFrom.textContent = `${wallet.wallet_name} (IDR ${parseInt(wallet.balance).toLocaleString()})`;
+                    transferFrom.appendChild(optionFrom);
+
+                    const optionTo = document.createElement('option');
+                    optionTo.value = wallet.wallet_id;
+                    optionTo.textContent = wallet.wallet_name;
+                    transferTo.appendChild(optionTo);
+                });
+                console.log('Dropdowns populated successfully');
+            } else {
+                console.error('API returned success=false:', result.message);
+                alert('Failed to load wallets: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error fetching wallets for transfer:', error);
+            alert('Error loading wallets. Check console for details.');
+        }
+    }
 });
 
 async function loadWallets() {

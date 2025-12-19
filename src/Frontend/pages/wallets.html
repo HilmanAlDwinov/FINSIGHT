@@ -18,9 +18,14 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>My Wallets</h2>
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addWalletModal">
-                <i class="fas fa-plus"></i> Add Wallet
-            </button>
+            <div>
+                <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#transferModal">
+                    <i class="fas fa-exchange-alt"></i> Transfer
+                </button>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addWalletModal">
+                    <i class="fas fa-plus"></i> Add Wallet
+                </button>
+            </div>
         </div>
 
         <!-- Wallets Grid -->
@@ -96,6 +101,44 @@
                             <input type="number" class="form-control" id="editBalance" required>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Update Wallet</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Modal -->
+    <div class="modal fade" id="transferModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Transfer Funds</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="transferForm">
+                        <div class="mb-3">
+                            <label for="transferFrom" class="form-label">From Wallet</label>
+                            <select class="form-select" id="transferFrom" required>
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="transferTo" class="form-label">To Wallet</label>
+                            <select class="form-select" id="transferTo" required>
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="transferAmount" class="form-label">Amount</label>
+                            <input type="number" class="form-control" id="transferAmount" required min="1"
+                                placeholder="0">
+                        </div>
+                        <div class="mb-3">
+                            <label for="transferNotes" class="form-label">Notes (Optional)</label>
+                            <input type="text" class="form-control" id="transferNotes" placeholder="e.g. Pay back debt">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Confirm Transfer</button>
                     </form>
                 </div>
             </div>

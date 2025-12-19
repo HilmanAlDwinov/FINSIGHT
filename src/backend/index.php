@@ -149,6 +149,26 @@ if (isset($uri[3])) {
         exit();
     }
 
+    // TRANSFER ROUTES (Protected)
+    if ($resource === 'transfers') {
+        require_once 'middleware/AuthMiddleware.php';
+        require_once 'controllers/TransferController.php';
+        
+        $authMiddleware = new AuthMiddleware();
+        $userData = $authMiddleware->validateToken();
+        $userId = $userData['user_id'];
+
+        $transferController = new TransferController($userId);
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $transferController->create();
+        } else {
+            http_response_code(405);
+            echo json_encode(["message" => "Method Not Allowed"]);
+        }
+        exit();
+    }
+
     // PROFILE ROUTES (Protected)
     if ($resource === 'profile') {
         require_once 'middleware/AuthMiddleware.php';
