@@ -278,6 +278,9 @@ body::before {
 .table {
     margin-bottom: 0;
     color: var(--text-primary);
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-primary);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.05); 
 }
 
 .table thead th {
