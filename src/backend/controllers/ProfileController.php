@@ -18,13 +18,14 @@ class ProfileController {
         $user_id = $this->user_id;
 
         try {
-            // Get Basic User Info
-            $stmt = $this->conn->prepare("SELECT id, name, email FROM users WHERE id = ?");
+            // Get Basic User Info (PK: user_id)
+            $stmt = $this->conn->prepare("SELECT user_id, name, email FROM users WHERE user_id = ?");
             $stmt->execute([$user_id]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
-                Response::send(404, false, 'User not found');
+                // Correct Signature: send($success, $message, $data, $code)
+                Response::send(false, 'User not found', [], 404);
                 return;
             }
 
@@ -36,19 +37,25 @@ class ProfileController {
             // Merge data
             $data = [
                 'user' => $user,
-                'profile' => $profile ? $profile : null // Null if not set yet
+                'profile' => $profile ? $profile : null 
             ];
 
-            Response::send(200, true, 'Profile retrieved successfully', $data);
+            Response::send(true, 'Profile retrieved successfully', $data, 200);
 
         } catch (PDOException $e) {
-            Response::send(500, false, 'Database error: ' . $e->getMessage());
+            Response::send(false, 'Database error: ' . $e->getMessage(), [], 500);
         }
     }
 
     public function updateProfile() {
         $user_id = $this->user_id;
         $data = json_decode(file_get_contents("php://input"), true);
+
+        // Check for Password Update Action
+        if (isset($data['action']) && $data['action'] === 'change_password') {
+             $this->changePassword($user_id, $data);
+             return;
+        }
 
         // Fields for User Account
         $name = isset($data['name']) ? trim($data['name']) : null;
@@ -65,14 +72,25 @@ class ProfileController {
 
             // 1. Update User Account (Name/Email) if provided
             if ($name || $email) {
-                $updateUserQuery = "UPDATE users SET name = COALESCE(:name, name), email = COALESCE(:email, email) WHERE user_id = :uid";
-                $stmtUser = $this->conn->prepare($updateUserQuery);
-                // COALESCE keeps existing value if param is null, but we passed explicit values. 
-                // Better: Only update if logic demands. For now, simple update.
-                $stmtUser->bindParam(':name', $name);
-                $stmtUser->bindParam(':email', $email);
-                $stmtUser->bindParam(':uid', $user_id);
-                $stmtUser->execute();
+                $updates = [];
+                $params = [];
+                
+                if ($name) {
+                    $updates[] = "name = :name";
+                    $params[':name'] = $name;
+                }
+                if ($email) {
+                    $updates[] = "email = :email";
+                    $params[':email'] = $email;
+                }
+
+                if (!empty($updates)) {
+                    $params[':uid'] = $user_id;
+                    // PK: user_id
+                    $sql = "UPDATE users SET " . implode(", ", $updates) . " WHERE user_id = :uid";
+                    $stmtUser = $this->conn->prepare($sql);
+                    $stmtUser->execute($params);
+                }
             }
 
             // 2. Check/Update Profile
@@ -101,11 +119,42 @@ class ProfileController {
             $stmt->execute();
 
             $this->conn->commit();
-            Response::send(200, true, 'Profile updated successfully');
+            Response::send(true, 'Profile updated successfully', [], 200);
 
         } catch (PDOException $e) {
             $this->conn->rollBack();
-            Response::send(500, false, 'Database error: ' . $e->getMessage());
+            Response::send(false, 'Database error: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    private function changePassword($user_id, $data) {
+        $current = $data['current_password'] ?? '';
+        $new = $data['new_password'] ?? '';
+
+        if (!$current || !$new) {
+            Response::send(false, 'Current and New Password required', [], 400);
+            return;
+        }
+
+        try {
+            // Verify Current (PK: user_id)
+            $stmt = $this->conn->prepare("SELECT password FROM users WHERE user_id = ?");
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user || !password_verify($current, $user['password'])) {
+                 Response::send(false, 'Current password incorrect', [], 401);
+                 return;
+            }
+
+            // Update (PK: user_id)
+            $hash = password_hash($new, PASSWORD_DEFAULT);
+            $upd = $this->conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+            $upd->execute([$hash, $user_id]);
+
+            Response::send(true, 'Password updated successfully', [], 200);
+        } catch (PDOException $e) {
+            Response::send(false, 'Database error: ' . $e->getMessage(), [], 500);
         }
     }
 }

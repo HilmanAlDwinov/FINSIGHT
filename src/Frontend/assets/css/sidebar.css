@@ -309,6 +309,44 @@ body {
     text-overflow: ellipsis;
 }
 
+/* --- NEW: Logout Button in User Profile --- */
+.logout-btn-container {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.logout-btn-container:hover {
+    opacity: 1;
+}
+
+.logout-btn {
+    background: transparent;
+    border: none;
+    color: #ffdce0;
+    /* Soft reddish tint */
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.sidebar.collapsed .logout-btn-container {
+    display: none;
+}
+
+
 /* =====================================================
    Main Content
    ===================================================== */
@@ -322,7 +360,7 @@ body {
     padding: 2rem;
 }
 
-.sidebar.collapsed ~ .main-content {
+.sidebar.collapsed~.main-content {
     margin-left: var(--sidebar-collapsed-width);
 }
 
@@ -399,7 +437,7 @@ body {
         justify-content: center;
     }
 
-    .sidebar.collapsed ~ .main-content {
+    .sidebar.collapsed~.main-content {
         margin-left: 0;
     }
 }
@@ -432,6 +470,7 @@ body {
         opacity: 0;
         transform: translateX(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -442,12 +481,29 @@ body {
     animation: slideIn 0.3s ease backwards;
 }
 
-.nav-item:nth-child(1) { animation-delay: 0.05s; }
-.nav-item:nth-child(2) { animation-delay: 0.1s; }
-.nav-item:nth-child(3) { animation-delay: 0.15s; }
-.nav-item:nth-child(4) { animation-delay: 0.2s; }
-.nav-item:nth-child(5) { animation-delay: 0.25s; }
-.nav-item:nth-child(6) { animation-delay: 0.3s; }
+.nav-item:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.nav-item:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.nav-item:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.nav-item:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.nav-item:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.nav-item:nth-child(6) {
+    animation-delay: 0.3s;
+}
 
 /* =====================================================
    Tooltip for Collapsed Sidebar

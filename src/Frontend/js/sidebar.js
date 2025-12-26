@@ -1,8 +1,8 @@
 // Sidebar Component
 class Sidebar {
     constructor() {
-        this.sidebar = null;
-        this.overlay = null;
+        this.sidebar = document.getElementById('sidebar');
+        this.overlay = document.getElementById('sidebarOverlay');
         this.currentPage = this.getCurrentPage();
         this.init();
     }
@@ -16,62 +16,29 @@ class Sidebar {
     getMenuItems() {
         return [
             {
-                section: 'Main',
+                section: 'Menu',
                 items: [
-                    {
-                        name: 'Dashboard',
-                        icon: 'fa-home',
-                        url: 'dashboard.html',
-                        page: 'dashboard.html'
-                    },
-                    {
-                        name: 'Wallets',
-                        icon: 'fa-wallet',
-                        url: 'wallets.html',
-                        page: 'wallets.html'
-                    },
-                    {
-                        name: 'Transactions',
-                        icon: 'fa-exchange-alt',
-                        url: 'transactions.html',
-                        page: 'transactions.html'
-                    },
-                    {
-                        name: 'Budgets',
-                        icon: 'fa-chart-pie',
-                        url: 'budgets.html',
-                        page: 'budgets.html'
-                    },
-                    {
-                        name: 'Insights',
-                        icon: 'fa-lightbulb',
-                        url: 'insights.html',
-                        page: 'insights.html'
-                    }
-                ]
-            },
-            {
-                section: 'Account',
-                items: [
-                    {
-                        name: 'Settings',
-                        icon: 'fa-cog',
-                        url: 'settings.html',
-                        page: 'settings.html'
-                    },
-                    {
-                        name: 'Logout',
-                        icon: 'fa-sign-out-alt',
-                        url: '#',
-                        action: 'logout'
-                    }
+                    { name: 'Dashboard', icon: 'fa-home', url: 'dashboard.html', page: 'dashboard.html' },
+                    { name: 'Wallets', icon: 'fa-wallet', url: 'wallets.html', page: 'wallets.html' },
+                    { name: 'Transactions', icon: 'fa-exchange-alt', url: 'transactions.html', page: 'transactions.html' },
+                    { name: 'Budgets', icon: 'fa-chart-pie', url: 'budgets.html', page: 'budgets.html' },
+                    { name: 'Insights', icon: 'fa-lightbulb', url: 'insights.html', page: 'insights.html' },
+                    { name: 'AI Chat', icon: 'fa-robot', url: 'chat.html', page: 'chat.html' }
                 ]
             }
+            // Account Section Removed
         ];
     }
 
     init() {
-        this.render();
+        // Render only if sidebar doesn't exist
+        if (!this.sidebar) {
+            this.render();
+            // Re-select after render
+            this.sidebar = document.getElementById('sidebar');
+            this.overlay = document.getElementById('sidebarOverlay');
+        }
+
         this.attachEventListeners();
         this.loadUserInfo();
     }
@@ -80,28 +47,16 @@ class Sidebar {
         const menuItems = this.getMenuItems();
 
         const sidebarHTML = `
-            <!-- Mobile Menu Button -->
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
-                <i class="fas fa-bars"></i>
-            </button>
-
-            <!-- Sidebar Overlay -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
             <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-            <!-- Sidebar -->
             <aside class="sidebar" id="sidebar">
-                <!-- Sidebar Header -->
                 <div class="sidebar-header">
                     <a href="dashboard.html" class="sidebar-brand">
-                        <div class="brand-icon">F</div>
+                        <div class="brand-icon"><i class="fas fa-chart-line"></i></div>
                         <span class="brand-text">FINSIGHT</span>
                     </a>
-                    <button class="sidebar-toggle" id="sidebarToggle">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
+                    <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-chevron-left"></i></button>
                 </div>
-
-                <!-- Sidebar Navigation -->
                 <nav class="sidebar-nav">
                     ${menuItems.map(section => `
                         <div class="nav-section">
@@ -109,12 +64,8 @@ class Sidebar {
                             <ul class="nav-menu">
                                 ${section.items.map(item => `
                                     <li class="nav-item">
-                                        <a href="${item.url}"
-                                           class="nav-link ${this.currentPage === item.page ? 'active' : ''}"
-                                           ${item.action ? `data-action="${item.action}"` : ''}>
-                                            <span class="nav-icon">
-                                                <i class="fas ${item.icon}"></i>
-                                            </span>
+                                        <a href="${item.url}" class="nav-link ${this.currentPage === item.page ? 'active' : ''}" ${item.action ? `data-action="${item.action}"` : ''}>
+                                            <span class="nav-icon"><i class="fas ${item.icon}"></i></span>
                                             <span class="nav-text">${item.name}</span>
                                         </a>
                                     </li>
@@ -123,192 +74,118 @@ class Sidebar {
                         </div>
                     `).join('')}
                 </nav>
-
-                <!-- Sidebar Footer -->
                 <div class="sidebar-footer">
-                    <div class="user-profile" id="userProfile">
-                        <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-profile" id="userProfile" title="Click to view Settings">
+                        <div class="user-avatar" id="userAvatar"><i class="fas fa-user"></i></div>
                         <div class="user-info">
-                            <div class="user-name" id="userName">Loading...</div>
-                            <div class="user-email" id="userEmail">user@example.com</div>
+                            <div class="user-name" id="userName">User</div>
+                            <div class="user-email" id="userEmail">user@finsight.com</div>
+                        </div>
+                        <div class="logout-btn-container">
+                            <button class="logout-btn" id="logoutBtn" title="Sign Out">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </aside>
         `;
 
-        // Insert sidebar at the beginning of body
         document.body.insertAdjacentHTML('afterbegin', sidebarHTML);
 
-        // Wrap existing content in main-content div if not already wrapped
+        // Ensure main content wrapper
         if (!document.querySelector('.main-content')) {
-            const existingContent = Array.from(document.body.children)
-                .filter(child => !child.classList.contains('sidebar') &&
-                    !child.classList.contains('sidebar-overlay') &&
-                    !child.classList.contains('mobile-menu-btn'));
-
-            const mainContent = document.createElement('div');
+            const mainContent = document.createElement('main');
             mainContent.className = 'main-content';
-
-            existingContent.forEach(child => {
-                mainContent.appendChild(child);
-            });
-
+            while (document.body.children.length > 3) { // 3 elements are btn, overlay, sidebar
+                mainContent.appendChild(document.body.children[3]);
+            }
             document.body.appendChild(mainContent);
         }
-
-        // Store references
-        this.sidebar = document.getElementById('sidebar');
-        this.overlay = document.getElementById('sidebarOverlay');
     }
 
     attachEventListeners() {
-        // Toggle sidebar
         const toggleBtn = document.getElementById('sidebarToggle');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => this.toggleSidebar());
-        }
-
-        // Mobile menu button
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', () => this.toggleMobileSidebar());
+        const userProfile = document.getElementById('userProfile');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        if (toggleBtn) toggleBtn.addEventListener('click', () => this.toggleSidebar());
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', () => this.toggleMobileSidebar());
+        if (this.overlay) this.overlay.addEventListener('click', () => this.closeMobileSidebar());
+
+        // Navigate to Settings on User Profile Click
+        if (userProfile) {
+            userProfile.addEventListener('click', () => {
+                window.location.href = 'settings.html';
+            });
         }
 
-        // Overlay click
-        if (this.overlay) {
-            this.overlay.addEventListener('click', () => this.closeMobileSidebar());
+        // Logout Button Logic
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent triggering parent click (Settings)
+                this.handleLogout();
+            });
         }
 
-        // Logout action
-        const logoutLinks = document.querySelectorAll('[data-action="logout"]');
-        logoutLinks.forEach(link => {
+        // Clean up redundant logout handlers from old nav listeners if any
+        document.querySelectorAll('[data-action="logout"]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.handleLogout();
             });
         });
-
-        // Close mobile sidebar when clicking nav links
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    this.closeMobileSidebar();
-                }
-            });
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                this.closeMobileSidebar();
-            }
-        });
     }
 
     toggleSidebar() {
-        if (this.sidebar) {
-            this.sidebar.classList.toggle('collapsed');
+        if (!this.sidebar) return;
+        this.sidebar.classList.toggle('collapsed');
+        localStorage.setItem('sidebarCollapsed', this.sidebar.classList.contains('collapsed'));
 
-            // Update toggle icon
-            const toggleIcon = document.querySelector('#sidebarToggle i');
-            if (toggleIcon) {
-                if (this.sidebar.classList.contains('collapsed')) {
-                    toggleIcon.className = 'fas fa-chevron-right';
-                } else {
-                    toggleIcon.className = 'fas fa-chevron-left';
-                }
-            }
-
-            // Save state to localStorage
-            localStorage.setItem('sidebarCollapsed', this.sidebar.classList.contains('collapsed'));
-        }
+        // Update Icon
+        const icon = this.sidebar.querySelector('#sidebarToggle i');
+        if (icon) icon.className = this.sidebar.classList.contains('collapsed') ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
     }
 
     toggleMobileSidebar() {
-        if (this.sidebar && this.overlay) {
-            this.sidebar.classList.toggle('mobile-active');
-            this.overlay.classList.toggle('active');
-        }
+        if (this.sidebar) this.sidebar.classList.toggle('mobile-active');
+        if (this.overlay) this.overlay.classList.toggle('active');
     }
 
     closeMobileSidebar() {
-        if (this.sidebar && this.overlay) {
-            this.sidebar.classList.remove('mobile-active');
-            this.overlay.classList.remove('active');
-        }
+        if (this.sidebar) this.sidebar.classList.remove('mobile-active');
+        if (this.overlay) this.overlay.classList.remove('active');
     }
 
     loadUserInfo() {
-        // Get user info from localStorage
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        // CORRECT KEY: 'finsight_user'
+        const userStr = localStorage.getItem('finsight_user');
 
-        const userNameEl = document.getElementById('userName');
-        const userEmailEl = document.getElementById('userEmail');
-        const userAvatarEl = document.getElementById('userAvatar');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                const nameEl = document.querySelector('.sidebar-footer .user-name');
+                const emailEl = document.querySelector('.sidebar-footer .user-email');
 
-        if (user.name) {
-            if (userNameEl) userNameEl.textContent = user.name;
-            if (userEmailEl) userEmailEl.textContent = user.email || '';
-            if (userAvatarEl) {
-                userAvatarEl.textContent = user.name.charAt(0).toUpperCase();
+                if (nameEl) nameEl.textContent = user.name || user.username || 'User';
+                if (emailEl) emailEl.textContent = user.email || 'user@finsight.com';
+            } catch (e) {
+                console.error("Error parsing user data", e);
             }
-        } else {
-            // Try to get from API if available
-            this.fetchUserInfo();
-        }
-
-        // Restore sidebar state
-        const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        if (sidebarCollapsed && this.sidebar) {
-            this.sidebar.classList.add('collapsed');
-            const toggleIcon = document.querySelector('#sidebarToggle i');
-            if (toggleIcon) {
-                toggleIcon.className = 'fas fa-chevron-right';
-            }
-        }
-    }
-
-    async fetchUserInfo() {
-        try {
-            // Check if API is available
-            if (typeof API !== 'undefined') {
-                const response = await API.get('/auth/profile');
-                if (response.success && response.data) {
-                    const user = response.data;
-
-                    const userNameEl = document.getElementById('userName');
-                    const userEmailEl = document.getElementById('userEmail');
-                    const userAvatarEl = document.getElementById('userAvatar');
-
-                    if (userNameEl) userNameEl.textContent = user.name || 'User';
-                    if (userEmailEl) userEmailEl.textContent = user.email || '';
-                    if (userAvatarEl) {
-                        userAvatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
-                    }
-
-                    // Save to localStorage
-                    localStorage.setItem('user', JSON.stringify(user));
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching user info:', error);
         }
     }
 
     handleLogout() {
-        // Clear localStorage
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('sidebarCollapsed');
-
-        // Redirect to login
-        window.location.href = 'login.html';
+        if (confirm('Are you sure you want to sign out?')) {
+            localStorage.removeItem('finsight_token');
+            localStorage.removeItem('finsight_user');
+            localStorage.removeItem('sidebarCollapsed');
+            window.location.href = 'login.html';
+        }
     }
 }
 
-// Initialize sidebar when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     new Sidebar();
 });

@@ -9,15 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Display User Name in sidebar
-    const userName = document.querySelector('.user-name');
-    const userEmail = document.querySelector('.user-email');
-    if (userName && user.name) {
-        userName.textContent = user.name;
-    }
-    if (userEmail && user.email) {
-        userEmail.textContent = user.email;
-    }
+    // Display User Name handled by sidebar.js
+    console.log("Dashboard Loaded");
 
     loadDashboardData();
 });
