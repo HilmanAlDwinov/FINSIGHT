@@ -238,6 +238,21 @@
     <script src="../js/api.js"></script>
     <script src="../js/sidebar.js"></script>
     <script src="../js/dashboard.js"></script>
+
+    <!-- Chat Widget -->
+    <script>
+        // Load chat widget HTML
+        fetch('../components/chat-widget.html')
+            .then(response => response.text())
+            .then(html => {
+                document.body.insertAdjacentHTML('beforeend', html);
+                // Load chat widget script after HTML is loaded
+                const script = document.createElement('script');
+                script.src = '../js/chat-widget.js';
+                document.body.appendChild(script);
+            })
+            .catch(error => console.error('Error loading chat widget:', error));
+    </script>
 </body>
 
 </html>
