@@ -63,3 +63,7 @@ Akses: `http://localhost:8000/backend/diagnostic.php`
 **Tim Pengembang**:
 - Syarif Hidayatullah
 - Hilman Al Dwinov
+- Yossa Yudhistira Maulanda
+- Primandaru Adi Damara
+- Ibrahim Ivanka
+- Muhammad Farid bin J

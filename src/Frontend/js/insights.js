@@ -541,16 +541,30 @@ function renderInsightsSummary(insights) {
     if (infoEl) infoEl.textContent = info;
     if (successEl) successEl.textContent = success;
 
-    // Update health score
-    const healthScore = calculateHealthScore(insights);
+    // Check for empty data
+    const hasData = insightsData.transactions.length > 0 || insightsData.wallets.length > 0;
+
     const healthScoreEl = document.getElementById('healthScore');
     const healthScoreBarEl = document.getElementById('healthScoreBar');
+    const healthStatus = document.getElementById('healthStatus');
+
+    if (!hasData) {
+        if (healthScoreEl) healthScoreEl.textContent = 'N/A';
+        if (healthScoreBarEl) healthScoreBarEl.style.width = '0%';
+        if (healthStatus) {
+            healthStatus.textContent = '-';
+            healthStatus.className = 'health-status info';
+        }
+        return;
+    }
+
+    // Update health score
+    const healthScore = calculateHealthScore(insights);
 
     if (healthScoreEl) healthScoreEl.textContent = healthScore;
     if (healthScoreBarEl) healthScoreBarEl.style.width = `${healthScore}%`;
 
     // Update health status
-    const healthStatus = document.getElementById('healthStatus');
     if (healthStatus) {
         if (healthScore >= 80) {
             healthStatus.textContent = 'Sangat Baik';

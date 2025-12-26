@@ -77,3 +77,12 @@ Fitur "Static AI" yang menganalisis data keuangan user dan memberikan insight ot
 ## 10. Debugging Data Integrity
 -   Pembuatan `diagnostic.php` untuk memverifikasi isi database, validitas User ID, dan integritas Foreign Key (hubungan antar tabel).
 -   Alat ini digunakan untuk memastikan data transaksi benar-benar tersimpan di database sebelum dianalisis oleh Insights Engine.
+
+## 11. Implementasi Dashboard Visualization (Phase 4)
+Menambahkan grafik interaktif untuk memenuhi gap analysis visualisasi data.
+-   **Library**: Menggunakan `Chart.js` (via CDN) untuk rendering grafik yang ringan dan responsif.
+-   **Implementasi**:
+    -   **Frontend HTML**: Menambahkan elemen `<canvas>` di `dashboard.html` di bawah kartu statistik.
+    -   **Frontend JS**: Menambahkan logika agregasi data bulanan (6 bulan terakhir) di `dashboard.js`.
+    -   **Visual**: Grafik garis (Line Chart) membandingkan Income vs Expense dengan area fill gradient.
+-   **Outcome**: User dapat melihat tren arus kas (Cashflow) secara visual, meningkatkan "premium feel" aplikasi.

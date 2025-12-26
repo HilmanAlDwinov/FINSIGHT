@@ -8,7 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/sidebar.css?v=5.0">
+    <link rel="stylesheet" href="../assets/css/sidebar.css?v=5.0">
     <link rel="stylesheet" href="../assets/css/style.css?v=5.0">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -160,13 +163,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-4 col-md-12">
                 <div class="stats-card balance-card">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <div class="stats-label">Total Balance</div>
                             <div class="stats-value" id="totalBalance">IDR 0</div>
-                            <span class="stats-period">Current balance</span>
+                            <span class="stats-period">All wallets</span>
                         </div>
                         <div class="stats-icon">
                             <i class="fas fa-wallet"></i>
@@ -175,6 +178,22 @@
                 </div>
             </div>
         </div>
+
+        <!-- Cashflow Chart Section -->
+        <div class="glass-card mb-4">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-chart-area text-primary-custom"></i>
+                    Monthly Cashflow
+                </h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px; position: relative;">
+                    <canvas id="cashflowChart"></canvas>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Budget Monitoring -->
         <div class="glass-card">
