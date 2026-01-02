@@ -86,3 +86,33 @@ Based on PRD v1.0 (Dec 17, 2024).
         - [ ] Setup alert thresholds (CPU, Memory, Disk)
         - [ ] Create escalation policies
         - [ ] Test alert notifications
+
+
+Local DNS and Nagios Monitoring Setup (Containerized)
+Overview
+Revisiting the infrastructure to use a fully containerized approach (BIND9 + Nagios) for FINSIGHT expo/demo deployment, as inspired by the eduflip-main reference project.
+
+Tasks
+Component Setup (Containerized)
+ Create BIND9 configuration (
+named.conf
+)
+ Create BIND9 zone file (db.finsight.local)
+ Create Nagios configuration (finsight.cfg)
+ Update 
+docker-compose.local.yml
+ with dns and nagios services
+Documentation Updates
+ Update Local DNS setup guide (BIND9 focus)
+ Update Nagios installation guide (Docker focus)
+ Update main 
+README.md
+ for the unified stack
+Verification
+ Test DNS resolution via BIND9 container
+ Test Nagios monitoring dashboard
+ Test end-to-end setup (Expo simulation)
+ Verify health endpoint integration
+Cleanup
+ Deprecate/Remove manual WSL2 installation scripts if no longer needed
+ Update troubleshooting guides for the containerized stack

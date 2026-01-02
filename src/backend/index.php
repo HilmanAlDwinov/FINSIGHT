@@ -4,6 +4,12 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, GET, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
+// Load Environment Variables
+if (file_exists(__DIR__ . '/utils/DotEnv.php')) {
+    require_once __DIR__ . '/utils/DotEnv.php';
+    DotEnv::load(__DIR__ . '/../../.env');
+}
+
 // Disable HTML error output for API
 ini_set('display_errors', 0);
 error_reporting(E_ALL);

@@ -1,0 +1,25 @@
+# Manual Hosts File Configuration
+# Use this as an alternative to dnsmasq for simpler setup
+# 
+# Instructions:
+# 1. Find your laptop's IP address:
+#    Windows: Open PowerShell and run: ipconfig
+#    Look for "IPv4 Address" under your WiFi adapter
+#    Example: 192.168.1.100
+#
+# 2. Edit the hosts file on each device that needs access:
+#    Windows: C:\Windows\System32\drivers\etc\hosts
+#    Linux/Mac: /etc/hosts
+#    
+# 3. Add this line (replace with your actual IP):
+#    192.168.1.100  finsight.local www.finsight.local
+#
+# 4. Save the file (requires administrator/root privileges)
+#
+# 5. Test by pinging: ping finsight.local
+
+# Example entries (replace 192.168.1.100 with your laptop IP):
+192.168.1.100  finsight.local
+192.168.1.100  www.finsight.local
+192.168.1.100  api.finsight.local
+192.168.1.100  nagios.finsight.local

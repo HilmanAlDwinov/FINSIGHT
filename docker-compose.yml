@@ -35,17 +35,17 @@ services:
       - ./src/database/seeds.sql:/docker-entrypoint-initdb.d/2_seeds.sql
       - ./src/database/migrations.sql:/docker-entrypoint-initdb.d/migrations.sql
 
-  phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: finsight_phpmyadmin
-    ports:
-      - "8081:80"
-    environment:
-      - PMA_HOST=mysql
-      - PMA_USER=root
-      - PMA_PASSWORD=root
-    depends_on:
-      - mysql
+  # phpmyadmin:
+  #   image: phpmyadmin:latest
+  #   container_name: finsight_phpmyadmin
+  #   ports:
+  #     - "8081:80"
+  #   environment:
+  #     - PMA_HOST=mysql
+  #     - PMA_USER=root
+  #     - PMA_PASSWORD=root
+  #   depends_on:
+  #     - mysql
 
 volumes:
   db_data:

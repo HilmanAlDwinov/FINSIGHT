@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/backend/index.php';
+const API_BASE_URL = '/backend/index.php';
 
 class APIClient {
     static async request(endpoint, method = 'GET', body = null) {

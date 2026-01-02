@@ -32,9 +32,9 @@ function initializeChatWidget() {
         return;
     }
 
-    // Toggle chat panel
+    // Redirect to chat page
     chatBubble.addEventListener('click', () => {
-        toggleChatPanel();
+        window.location.href = 'chat.html';
     });
 
     // Close chat panel

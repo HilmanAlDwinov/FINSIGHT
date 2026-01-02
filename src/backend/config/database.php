@@ -9,10 +9,10 @@ class Database {
 
     public function __construct() {
         // Load from environment or use defaults matching docker-compose
-        $this->host = getenv('DB_HOST') ?: 'mysql';
+        $this->host = getenv('DB_HOST') ?: 'mysql-db';
         $this->db_name = getenv('DB_NAME') ?: 'finsight_db';
-        $this->username = getenv('DB_USER') ?: 'finsight_user';
-        $this->password = getenv('DB_PASSWORD') ?: 'finsight_pass';
+        $this->username = getenv('DB_USER') ?: 'root';
+        $this->password = getenv('DB_PASSWORD') ?: 'root';
     }
 
     public function getConnection() {
@@ -27,7 +27,7 @@ class Database {
             $this->conn->exec("set names utf8");
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $exception) {
-            echo "Connection error: " . $exception->getMessage();
+            error_log("Connection error: " . $exception->getMessage());
         }
 
         return $this->conn;

@@ -86,3 +86,105 @@ Menambahkan grafik interaktif untuk memenuhi gap analysis visualisasi data.
     -   **Frontend JS**: Menambahkan logika agregasi data bulanan (6 bulan terakhir) di `dashboard.js`.
     -   **Visual**: Grafik garis (Line Chart) membandingkan Income vs Expense dengan area fill gradient.
 -   **Outcome**: User dapat melihat tren arus kas (Cashflow) secara visual, meningkatkan "premium feel" aplikasi.
+
+## 12. Setup DNS Lokal dan Nagios Monitoring untuk Expo/Demo
+Implementasi infrastruktur deployment dan monitoring untuk presentasi expo menggunakan local network.
+
+### Struktur Folder Baru
+-   **`deployment/`**: Folder untuk konfigurasi deployment
+    -   `dns/`: Konfigurasi DNS lokal (dnsmasq, hosts file)
+    -   `docker/`: Docker Compose untuk local network
+    -   `scripts/`: Script otomasi (firewall, IP detection, Nagios installation)
+-   **`monitoring/`**: Folder untuk Nagios monitoring
+    -   `nagios-configs/`: Konfigurasi Nagios (hosts, services, contacts)
+    -   `checks/`: Custom monitoring check scripts
+-   **`docs/`**: Dokumentasi lengkap
+    -   `deployment/`: Panduan deployment (DNS, network, expo)
+    -   `monitoring/`: Panduan Nagios
+    -   `troubleshooting/`: Panduan troubleshooting
+
+### File Konfigurasi DNS
+-   **`deployment/dns/dnsmasq.conf`**: Konfigurasi DNS server lokal untuk domain `finsight.local`
+-   **`deployment/dns/hosts.example`**: Template manual hosts file sebagai alternatif dnsmasq
+
+### File Konfigurasi Docker
+-   **`deployment/docker/docker-compose.local.yml`**: Docker Compose untuk local network deployment dengan health checks
+-   **`deployment/docker/.env.local.example`**: Template environment variables untuk deployment lokal
+
+### Script Otomasi
+-   **`deployment/scripts/configure-firewall.ps1`**: Script PowerShell untuk konfigurasi Windows Firewall (port 80, 443, 3306, 8080)
+-   **`deployment/scripts/get-local-ip.ps1`**: Script untuk mendeteksi IP address laptop di WiFi
+-   **`deployment/scripts/install-nagios-wsl.sh`**: Script instalasi Nagios Core 4.x di WSL2 Ubuntu
+-   **`deployment/scripts/configure-monitoring.sh`**: Script untuk setup monitoring FINSIGHT di Nagios
+
+### Konfigurasi Nagios
+-   **`monitoring/nagios-configs/hosts/finsight-local.cfg`**: Definisi host untuk monitoring
+-   **`monitoring/nagios-configs/services/docker-services.cfg`**: Monitoring Docker containers (app, mysql, phpmyadmin)
+-   **`monitoring/nagios-configs/services/mysql-services.cfg`**: Monitoring MySQL database (connection, size, performance)
+-   **`monitoring/nagios-configs/services/web-services.cfg`**: Monitoring web services (HTTP, API health, response time)
+-   **`monitoring/nagios-configs/contacts/contacts.cfg`**: Konfigurasi kontak untuk alert notifications
+
+### Custom Monitoring Checks
+-   **`monitoring/checks/check_docker_service.sh`**: Check Docker daemon status
+-   **`monitoring/checks/check_docker_containers.sh`**: Check status container Docker individual
+-   **`monitoring/checks/check_mysql_finsight.sh`**: Check MySQL database health (size, performance)
+-   **`monitoring/checks/check_finsight_api.sh`**: Check FINSIGHT API health dan response time
+
+### API Health Endpoint
+-   **`src/backend/health.php`**: Endpoint health check untuk Nagios monitoring
+    -   Memeriksa koneksi database
+    -   Memeriksa file system
+    -   Memeriksa PHP version dan extensions
+    -   Return HTTP 200 jika healthy, 500 jika unhealthy
+
+### Dokumentasi Lengkap
+-   **`docs/deployment/local-dns-setup.md`**: Panduan setup DNS lokal (dnsmasq dan manual hosts file)
+-   **`docs/deployment/local-network-deployment.md`**: Panduan deployment di local network dengan troubleshooting
+-   **`docs/deployment/expo-preparation.md`**: Checklist persiapan expo lengkap dengan demo flow dan backup plan
+-   **`docs/monitoring/nagios-windows-installation.md`**: Panduan instalasi Nagios di WSL2 dengan troubleshooting
+-   **`docs/troubleshooting/network-issues.md`**: Panduan troubleshooting masalah network
+
+### Fitur Utama
+-   ✅ **Local DNS**: Akses aplikasi via `finsight.local` domain di local network
+-   ✅ **Docker Deployment**: Containerized deployment dengan health checks
+-   ✅ **Nagios Monitoring**: Real-time monitoring untuk Docker, MySQL, dan Web services
+-   ✅ **Custom Checks**: Plugin monitoring khusus untuk FINSIGHT
+-   ✅ **Firewall Automation**: Script otomatis untuk konfigurasi Windows Firewall
+-   ✅ **Dokumentasi Lengkap**: Panduan step-by-step untuk deployment dan troubleshooting
+-   ✅ **Expo Ready**: Checklist dan panduan lengkap untuk presentasi expo
+
+### Perbaikan dan Penyesuaian
+-   **MySQL Port**: Diubah dari 3306 ke 3307 untuk menghindari konflik dengan MySQL Windows service
+-   **Nagios MySQL Check**: Diupdate untuk menggunakan port 3307
+-   **Script Path Handling**: Diperbaiki quoting di `configure-monitoring.sh` untuk handle path dengan spasi
+-   **GitIgnore**: Diupdate untuk mengabaikan `.env.local` tapi tetap commit `.env.local.example`
+
+docker-compose -f deployment\docker\docker-compose.local.yml down
+
+## 13. Perbaikan Konfigurasi Docker Compose untuk Lingkungan Windows
+Perubahan konfigurasi Docker Compose untuk mengatasi masalah deployment di lingkungan Windows:
+
+### Masalah yang Dihadapi:
+-   **Port Conflict**: Port 3306 dan 8080 terdeteksi sudah digunakan oleh layanan lain (XAMPP, aplikasi lain)
+-   **DNS Server Issues**: Container BIND9 mengalami masalah mounting file di Windows (permission error)
+-   **File Permission Error**: Error "Device or resource busy" saat mengakses file konfigurasi BIND9
+
+### Solusi yang Diterapkan:
+-   **Perubahan Port MySQL**: Mengganti port eksternal MySQL dari 3306 ke port yang tersedia
+-   **Perubahan Port Nagios**: Mengganti port Nagios dari 8080 ke 8081
+-   **Perubahan Port phpMyAdmin**: Mengganti port phpMyAdmin dari 8080 ke 8082
+-   **Penghentian Sementara DNS Server**: Menghentikan service dns-server karena masalah kompatibilitas Windows
+-   **Update Dokumentasi**: Memperbarui README.md dengan instruksi deployment yang lebih jelas
+
+### Konfigurasi Akhir:
+-   **Main Application**: Port 80 (localhost)
+-   **MySQL Database**: Port 3306 (internal container), akses eksternal sesuai port yang tersedia
+-   **Nagios Monitoring**: Port 8081
+-   **phpMyAdmin**: Port 8082
+
+### Hasil:
+-   ✅ Semua layanan utama berjalan dengan lancar (app, mysql, nagios, phpmyadmin)
+-   ✅ Tidak ada konflik port
+-   ✅ Aplikasi dapat diakses melalui localhost
+-   ✅ Database connection berfungsi dengan baik
+-   ✅ Health check endpoint berjalan normal

@@ -1,0 +1,15 @@
+$TTL    600
+@       IN      SOA     ns1.finsight.local. admin.finsight.local. (
+                              2025010101         ; Serial
+                              604800             ; Refresh
+                              86400              ; Retry
+                              2419200            ; Expire
+                              600 )              ; Negative Cache TTL
+
+; Define nameservers
+@       IN      NS      ns1.finsight.local.
+
+; Reverse lookup entries (example for 192.168.1.x network)
+; These will need to be updated based on actual IP assignments
+14.1    IN      PTR     finsight.local.
+100.1   IN      PTR     laptop.finsight.local.

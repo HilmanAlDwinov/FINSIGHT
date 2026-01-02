@@ -10,3 +10,9 @@ node_modules/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Environment files (actual secrets)
+.env.local
+*.env.local
+# Keep example files (templates)
+# .env.local.example should be committed

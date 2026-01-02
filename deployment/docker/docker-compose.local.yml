@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # DNS Server (BIND9) - Local DNS resolution for finsight.local
+  dns-server:
+    image: ubuntu/bind9
+    container_name: finsight-dns
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    volumes:
+      - ./../../deployment/dns/named.conf:/etc/bind/named.conf
+      - ./../../deployment/dns:/etc/bind/zones
+    networks:
+      - finsight-network
+    restart: unless-stopped
+
+  # Nagios Core Monitoring Server
+  nagios:
+    image: jasonrivers/nagios:latest
+    container_name: finsight-nagios
+    ports:
+      - "8081:80"      # Nagios web interface
+    volumes:
+      - ./../../monitoring/nagios-configs/finsight.cfg:/opt/nagios/etc/objects/finsight.cfg:ro
+      - ./config/htpasswd.users:/opt/nagios/etc/htpasswd.users:ro
+      - nagios-logs:/opt/nagios/var
+      - nagios-cgi:/opt/nagios/sbin
+    networks:
+      - finsight-network
+    restart: unless-stopped
+    environment:
+      - NAGIOS_ADMIN_USER=${NAGIOS_ADMIN_USER:-nagiosadmin}
+      - NAGIOS_ADMIN_PASS=${NAGIOS_ADMIN_PASS:-nagios123}
+    depends_on:
+      - dns-server
+
+  # PHP Application Server
+  php-app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: finsight-app
+    ports:
+      - "80:80"      # HTTP access from local network
+      - "443:443"    # HTTPS (if SSL configured)
+    volumes:
+      - ../../src:/var/www/html
+      - app-logs:/var/log/apache2
+    environment:
+      - DB_HOST=mysql-db
+      - DB_NAME=${DB_NAME:-finsight_db}
+      - DB_USER=${DB_USER:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-root}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    networks:
+      - finsight-network
+    depends_on:
+      - mysql-db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/backend/health.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MySQL Database Server
+  mysql-db:
+    image: mysql:8.0
+    container_name: finsight-mysql
+    ports:
+      - "3306:3306"  # Exposed for Nagios monitoring
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME:-finsight_db}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ../../src/database/migrations.sql:/docker-entrypoint-initdb.d/01-migrations.sql
+      - ../../src/database/seeds.sql:/docker-entrypoint-initdb.d/02-seeds.sql
+    networks:
+      - finsight-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # phpMyAdmin (Optional - for database management)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: finsight-phpmyadmin
+    ports:
+      - "8082:80"    # Access via http://finsight.local:8082
+    environment:
+      PMA_HOST: mysql-db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_PASSWORD:-root}
+    networks:
+      - finsight-network
+    depends_on:
+      - mysql-db
+    restart: unless-stopped
+
+networks:
+  finsight-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  mysql-data:
+    driver: local
+  app-logs:
+    driver: local
+  bind-config:
+    driver: local
+  bind-data:
+    driver: local
+  bind-logs:
+    driver: local
+  nagios-logs:
+    driver: local
+  nagios-cgi:
+    driver: local

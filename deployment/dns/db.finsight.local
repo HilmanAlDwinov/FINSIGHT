@@ -1,0 +1,23 @@
+$TTL    600
+@       IN      SOA     ns1.finsight.local. admin.finsight.local. (
+                              2025010101         ; Serial
+                              604800             ; Refresh
+                              86400              ; Retry
+                              2419200            ; Expire
+                              600 )              ; Negative Cache TTL
+
+; Define nameservers
+@       IN      NS      ns1.finsight.local.
+
+; A records for main services
+@       IN      A       172.20.0.10          ; Main application IP (within Docker network)
+www     IN      A       172.20.0.10
+api     IN      A       172.20.0.10
+
+; A records for individual services within Docker network
+app     IN      A       172.20.0.10          ; FINSIGHT application container
+db      IN      A       172.20.0.11          ; MySQL database container
+nagios  IN      A       172.20.0.12          ; Nagios monitoring container
+
+; Additional aliases
+phpmyadmin IN   A       172.20.0.11          ; Points to database container (for phpMyAdmin access)
