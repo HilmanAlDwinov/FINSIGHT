@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   # DNS Server (BIND9) - Local DNS resolution for finsight.local
@@ -42,7 +42,7 @@ services:
       dockerfile: Dockerfile
     container_name: finsight-app
     ports:
-      - "80:80"      # HTTP access from local network
+      - "8080:80"      # HTTP access from local network
       - "443:443"    # HTTPS (if SSL configured)
     volumes:
       - ../../src:/var/www/html
@@ -102,6 +102,7 @@ services:
     depends_on:
       - mysql-db
     restart: unless-stopped
+
 
 networks:
   finsight-network:
